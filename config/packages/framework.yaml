@@ -1,5 +1,9 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
+    assets:
+        version: 'v1.0.0'
+        version_format: '%%s?version=%%s'
+        
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
     http_method_override: false
