@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+
+
+    {{ form_start(form) }}
+        <p>
+            {{ form_row(form.firstname) }}
+        </p>
+        <p>
+            {{ form_row(form.name) }}
+        </p>
+        <p>
+            {{ form_row(form.email) }}
+        </p>
+        <p>
+            {{ form_row(form.password.first) }}
+        </p>
+        <p>
+            {{ form_row(form.password.second) }}
+        </p>
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
+        
+    {{ form_end(form) }}
+{% endblock %}

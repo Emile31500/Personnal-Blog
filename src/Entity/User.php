@@ -45,14 +45,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $password;
 
-    public function __Construct($user){
-
-        $this->setName($user['name']);
-        $this->setFirstname($user['firstname']);
-        $this->setEmail($user['email']);
-        $this->setPassword($user['password']);
-        $this->setRoles(['ROLE_USER']);
-
+    public function __Construct(){
 
     }
 
