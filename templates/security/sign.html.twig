@@ -4,26 +4,32 @@
 
 {% block body %}
 
+    {% if form is defined %}
+    
+        {{ form_start(form) }}
+        
+            <p>
+                {{ form_row(form.firstname) }}
+            </p>
+            <p>
+                {{ form_row(form.name) }}
+            </p>
+            <p>
+                {{ form_row(form.email) }}
+            </p>
+            <p>
+                {{ form_row(form.password.first) }}
+            </p>
+            <p>
+                {{ form_row(form.password.second) }}
+            </p>
+            <button type="submit" class="btn btn-primary">S'inscrire</button>
 
-    {{ form_start(form) }}
-        <p>
-            {{ form_row(form.firstname) }}
-        </p>
-        <p>
-            {{ form_row(form.name) }}
-        </p>
-        <p>
-            {{ form_row(form.email) }}
-        </p>
-        <p>
-            {{ form_row(form.password.first) }}
-        </p>
-        <p>
-            {{ form_row(form.password.second) }}
-        </p>
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
+        {{ form_end(form) }}
 
-        {% if message is defined %}
+    {% endif %}          
+
+    {% if message is defined %}
             <div class="alert alert-{{message.style}}">
                 <b>{{message.header}} : </b>
                 <p>
@@ -31,6 +37,4 @@
                 </p>
             </div>
         {% endif %}
-
-    {{ form_end(form) }}
 {% endblock %}

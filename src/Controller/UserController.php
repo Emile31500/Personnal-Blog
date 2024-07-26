@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,15 +22,16 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserController extends AbstractController
 {
 
-    #[Route('/inscription',  name: 'sign_up')]
-    public function signup(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
+    #[Route('/inscription', methods: ['GET', 'POST'], name: 'sign_up')]
+    public function signup(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
 
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
+           
             $user->setPassword(
                 $passwordHasher->hashPassword(
                     $user,
@@ -37,12 +39,18 @@ class UserController extends AbstractController
                 )
             );
 
-            return $this->render('registration/sign.html.twig',  
+            $entityManager->persist($user);
+            $entityManager->flush();
+            // var_dump($user);
+            // die;
+
+            return $this->render('security/sign.html.twig',  
                 [
+                    'form' => $form->createView(),
                     'controller_name' => 'Vérification de l\' email',
                     'message' => [
                         'header' => 'Information',
-                        'body' => 'Pour pouvoir vous authentifier, cliquez sur lien envoyé par email pour vérifier votre compte.',
+                        'body' => 'Votre compte a bien été créé',
                         'style' => 'success'
                     ],
                     
