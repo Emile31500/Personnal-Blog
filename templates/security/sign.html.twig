@@ -22,6 +22,15 @@
             {{ form_row(form.password.second) }}
         </p>
         <button type="submit" class="btn btn-primary">S'inscrire</button>
-        
+
+        {% if message is defined %}
+            <div class="alert alert-{{message.style}}">
+                <b>{{message.header}} : </b>
+                <p>
+                    {{ message.body}}
+                </p>
+            </div>
+        {% endif %}
+
     {{ form_end(form) }}
 {% endblock %}
