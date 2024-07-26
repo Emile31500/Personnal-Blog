@@ -22,6 +22,12 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserController extends AbstractController
 {
 
+    #[Route('/connexion', name: 'app_connexion')]
+    public function connexion(): Response
+    {
+        return $this->render('security/login.html.twig');
+    }
+
     #[Route('/inscription', methods: ['GET', 'POST'], name: 'sign_up')]
     public function signup(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -41,8 +47,6 @@ class UserController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
-            // var_dump($user);
-            // die;
 
             return $this->render('security/sign.html.twig',  
                 [

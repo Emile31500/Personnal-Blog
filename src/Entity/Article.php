@@ -5,31 +5,21 @@ namespace App\Entity;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ArticleRepository::class)
- */
+#[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=128)
-     */
+    #[ORM\Column(type: "string", length: 128)]
     private $title;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: "text")]
     private $content;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: "boolean")]
     private $isPublished;
 
     public function getId(): ?int
@@ -39,7 +29,7 @@ class Article
 
     public function getTitle(): ?string
     {
-        return $title;
+        return $this->title;
     }
 
     public function setTitle(string $title): self
@@ -51,7 +41,7 @@ class Article
 
     public function getContent(): ?string
     {
-        return $content;
+        return $this->content;
     }
 
     public function setContent(string $content): self
@@ -63,7 +53,7 @@ class Article
 
     public function getIsPublished(): ?bool
     {
-        return $isPublished;
+        return $this->isPublished;
     }
 
     public function setIsPublished(bool $isPublished): self
