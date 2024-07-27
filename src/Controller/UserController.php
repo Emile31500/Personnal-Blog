@@ -17,15 +17,20 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  
 class UserController extends AbstractController
 {
 
     #[Route('/login', methods:'GET', name: 'app_connexion')]
-    public function connexion(): Response
+    public function connexion(AuthenticationUtils $authenticationUtils): Response
     {
-        return $this->render('security/login.html.twig');
+
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', ['last_username'=> $lastUsername, 'error' => $error, 'auth' => $authenticationUtils]);
     }
 
     #[Route('/inscription', methods: ['GET', 'POST'], name: 'sign_up')]
@@ -33,7 +38,11 @@ class UserController extends AbstractController
     {
 
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, [
+            'attr' => [
+                'id' => 'signup-form'
+            ]
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

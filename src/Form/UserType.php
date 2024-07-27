@@ -32,12 +32,13 @@ class UserType extends AbstractType
             ->add('email', EmailType::class, ['label' => 'Email',
                 'attr' =>
                 [
+                    'id' => 'email',
                     'class' => 'form-control'
                 ]
             ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'first_options'  => ['label' => 'Mot de passe', 'attr' => ['class' => 'form-control']],
+                'first_options'  => ['label' => 'Mot de passe', 'attr' => ['class' => 'form-control', 'id' => 'password']],
                 'second_options' => ['label' => 'Répétez le mot de passe', 'attr' => ['class' => 'form-control']],
                 'mapped' => false
             ]);
