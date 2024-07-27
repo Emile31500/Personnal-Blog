@@ -22,7 +22,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserController extends AbstractController
 {
 
-    #[Route('/connexion', name: 'app_connexion')]
+    #[Route('/login', methods:'GET', name: 'app_connexion')]
     public function connexion(): Response
     {
         return $this->render('security/login.html.twig');

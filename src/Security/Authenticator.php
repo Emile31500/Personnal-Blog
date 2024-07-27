@@ -14,6 +14,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+// use Symfony\Bundle\SecurityBundle\Security;
 
 class Authenticator extends AbstractLoginFormAuthenticator
 {
@@ -32,7 +33,7 @@ class Authenticator extends AbstractLoginFormAuthenticator
     {
         $email = $request->request->get('email', '');
 
-        $request->getSession()->set(Security::LAST_USERNAME, $email);
+        // $request->getSession()->set(Security::LAST_USERNAME, $email);
 
         return new Passport(
             new UserBadge($email),
@@ -50,7 +51,7 @@ class Authenticator extends AbstractLoginFormAuthenticator
         }
 
         // For example:
-        // return new RedirectResponse($this->urlGenerator->generate('some_route'));
+        return new RedirectResponse($this->urlGenerator->generate('app_default'));
         throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
