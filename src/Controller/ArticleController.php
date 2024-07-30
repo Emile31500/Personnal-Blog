@@ -4,8 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ArticleController extends AbstractController
@@ -22,11 +28,11 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/articles/{id_article}',  name: 'app_article_detail',)]
-    public function articleDetail(): Response
+    #[Route('/articles/{id}/detail',  name: 'app_article_detail')]
+    public function articleDetail(Article $article): Response
     {
         return $this->render('article/detail.html.twig', [
-            'controller_name' => $article->getName(),
+            'article' => $article
         ]);
     }
 
@@ -40,11 +46,31 @@ class ArticleController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/create/articles/',  name: 'app_article_create',)]
-    public function articleCreat(): Response
+    #[Route('/articles/create',  name: 'app_article_create',)]
+    public function articleCreate(): Response
     {
-        return $this->render('article/edit.html.twig', [
+        return $this->render('article/create.html.twig', [
             'controller_name' => 'Nouvel article',
         ]);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/api/articles/', methods: 'POST',  name: 'api_article_create',)]
+    public function postArticle(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): Response
+    {
+        $article = $serializer->deserialize($request->getContent(), Article::class, 'json');
+
+        $errors = $validator->validate($article);
+        if (count($errors) > 0) {
+            $errorsString = (string) $errors;
+
+            return new Response($errorsString, Response::HTTP_BAD_REQUEST);
+        }
+        
+        $entityManager->persist($article);
+        $entityManager->flush();
+ 
+        $jsonArticle = $serializer->serialize($article, 'json');
+        return new Response($jsonArticle, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
 }

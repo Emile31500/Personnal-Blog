@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ controller_name }} {% endblock %}
+
+{% block body %}
+
+    <!-- Include stylesheet -->
+
+    <!-- Create the editor container -->
+
+    
+    <h2 class='my-5'> {{ controller_name }} </h2>
+
+    <form>
+        <div class='my-3'>
+            <label for='title' required> Titre : </label>
+            <br>
+            <input id='title' type='text' class='form-control'/>
+        </div>
+        <textarea id='article-text-area' class='d-none'>
+        </textarea>
+        <div id="editor">
+        </div>
+    </form>
+    <button id='save' class='mx-2 my-3 btn btn-outine-primary'>Sauvegarder</button>
+    <button id='publish' class='mx-2 my-3 btn btn-primary'>Publier</button>
+
+    
+
+    <!-- Include the Quill library -->
+
+    <!-- Initialize Quill editor -->
+    
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+{% endblock %}
+
+{% block javascript %}
+
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script>
+        const quill = new Quill('#editor', {
+            theme: 'snow'
+        });
+    </script>
+    <script src="{{ asset('/JS/Article/save.js') }}"></script>
+
+{% endblock %}
