@@ -1,7 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %} {{ controller_name }} {% endblock %}
+{% block title %} {{ article.title }} {% endblock %}
 
 {% block body %}
-
+    <h2 class='my-5'> {{ article.title }} </h2>
+    <div class='my-3'>
+        {{ article.content }}
+    </div>
 {% endblock %}
