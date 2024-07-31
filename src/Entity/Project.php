@@ -76,7 +76,7 @@ class Project
         return $this;
     }
 
-    public function isIsPublished(): ?bool
+    public function isPublished(): ?bool
     {
         return $this->isPublished;
     }
@@ -96,22 +96,22 @@ class Project
         return $this->media;
     }
 
-    public function addNameMedium(ProjectMedia $nameMedium): self
+    public function addProjectMedia(ProjectMedia $projectMedia): self
     {
-        if (!$this->media->contains($nameMedium)) {
-            $this->media[] = $nameMedium;
-            $nameMedium->setIdProject($this);
+        if (!$this->media->contains($projectMedia)) {
+            $this->media[] = $projectMedia;
+            $projectMedia->setIdProject($this);
         }
 
         return $this;
     }
 
-    public function removeNameMedium(ProjectMedia $nameMedium): self
+    public function removeProjectMedia(ProjectMedia $projectMedia): self
     {
-        if ($this->media->removeElement($nameMedium)) {
+        if ($this->media->removeElement($projectMedia)) {
             // set the owning side to null (unless already changed)
-            if ($nameMedium->getIdProject() === $this) {
-                $nameMedium->setIdProject(null);
+            if ($projectMedia->getIdProject() === $this) {
+                $projectMedia->setIdProject(null);
             }
         }
 
