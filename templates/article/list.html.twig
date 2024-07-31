@@ -4,9 +4,18 @@
 
 {% block body %}
 
+    {% if is_granted('ROLE_ADMIN') %}
+    
+        <div class='p-3 my-3 horizontal-scroll' style="box-shadow: 0 0.4em 1em grey;" id='unpublishedArticleZone'>
+
+            
+        </div>
+
+    {% endif %}
+
     {% for article in articles %}
         
-            <div class="row p-3 my-3" style="box-shadow: 0 0.4em 1em grey;">
+            <div class="row p-3 my-3" style="box-shadow: 0 0.1em 1em grey;">
                 <div class="col-4">
                     <h3 class="fs-4"> {{article.title}}</h3>
                 </div>
@@ -18,4 +27,19 @@
 
     {% endfor %}
 
+{% endblock %}
+{% block stylesheets %}
+
+    <style>
+
+        .horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+        }
+        
+    </style>
+
+{% endblock %}
+{% block javascript %}
+    <script src="{{ asset('/JS/Article/laodUnpublished.js') }}"></script>
 {% endblock %}

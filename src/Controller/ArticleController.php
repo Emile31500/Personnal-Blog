@@ -20,7 +20,7 @@ class ArticleController extends AbstractController
     public function articleList(int $index_page,ArticleRepository $articleRepository): Response
     {
         
-        $articles = $articleRepository->findByPublishedArticle($index_page-1);
+        $articles = $articleRepository->findPublishedArticle($index_page-1);
 
         return $this->render('article/list.html.twig', [
             'controller_name' => 'Articles',
@@ -52,6 +52,18 @@ class ArticleController extends AbstractController
         return $this->render('article/create.html.twig', [
             'controller_name' => 'Nouvel article',
         ]);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/api/articles/unpublished', methods: 'GET',  name: 'api_article_unpublished',)]
+    public function getPublishedArtocme(ArticleRepository $articleRepository, SerializerInterface $serializer): Response
+    {
+
+        $articles = $articleRepository->findUnpublishedArticle();
+        $jsonArticles = $serializer->serialize($articles, 'json');
+
+        return new Response($jsonArticles, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+
     }
 
     #[IsGranted('ROLE_ADMIN')]

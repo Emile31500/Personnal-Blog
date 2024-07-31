@@ -32,7 +32,7 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
 
-    public function findByPublishedArticle(int $page = 0): array
+    public function findPublishedArticle(int $page = 0): array
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.isPublished = :val')
@@ -40,6 +40,17 @@ class ArticleRepository extends ServiceEntityRepository
             ->orderBy('a.id', 'ASC')
             ->setFirstResult($page)
             ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findUnpublishedArticle(): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.isPublished = :val')
+            ->setParameter('val', false)
+            ->orderBy('a.id', 'ASC')
             ->getQuery()
             ->getResult()
         ;
