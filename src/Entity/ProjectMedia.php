@@ -13,11 +13,11 @@ class ProjectMedia
     #[ORM\Column(type: "integer")]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: "nameMedia")]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: "name")]
     private $id_project;
 
     #[ORM\Column(type: "string", length: 255)]
-    private $nameMedia;
+    private $name;
 
     public function getId(): ?int
     {
@@ -36,14 +36,14 @@ class ProjectMedia
         return $this;
     }
 
-    public function getNameMedia(): ?string
+    public function getName(): ?string
     {
-        return $this->nameMedia;
+        return $this->name;
     }
 
-    public function setNameMedia(string $nameMedia): self
+    public function setName(string $name): self
     {
-        $this->nameMedia = $nameMedia;
+        $this->name = $name;
 
         return $this;
     }
