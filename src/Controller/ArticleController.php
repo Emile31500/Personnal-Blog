@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ArticleController extends AbstractController
 {
     #[Route('/articles/page/{index_page}',  name: 'app_article_list',)]
-    public function articleList(int $index_page,ArticleRepository $articleRepository): Response
+    public function articleList(int $index_page, ArticleRepository $articleRepository): Response
     {
         
         $articles = $articleRepository->findPublishedArticle($index_page-1);
@@ -52,6 +53,19 @@ class ArticleController extends AbstractController
         return $this->render('article/create.html.twig', [
             'controller_name' => 'Nouvel article',
         ]);
+    }
+
+    #[Route('/api/articles/{id}', methods: 'GET',  name: 'api_article_detail')]
+    public function getDetailArticle(Article $article, Security $security, SerializerInterface $serializer): Response
+    {
+        if (!$security->isGranted('ROLE_ADMIN') || !$artcle->getIsPublished()) {
+
+            $jsonArticles = $serializer->serialize($article, 'json');
+            return new Response($jsonArticles, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+
+        }
+
+        return new Response('', Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
     }
 
     #[IsGranted('ROLE_ADMIN')]
