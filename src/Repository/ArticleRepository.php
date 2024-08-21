@@ -47,13 +47,14 @@ class ArticleRepository extends ServiceEntityRepository
 
     public function findUnpublishedArticle(): array
     {
-        return $this->createQueryBuilder('a')
+        $queryResult = $this->createQueryBuilder('a')
             ->andWhere('a.isPublished = :val')
             ->setParameter('val', false)
             ->orderBy('a.id', 'ASC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
+
+        return $queryResult;
     }
 
    public function findOneById(int $value): ?Article
