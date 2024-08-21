@@ -58,7 +58,7 @@ class ArticleController extends AbstractController
     #[Route('/api/articles/{id}', methods: 'GET',  name: 'api_article_detail')]
     public function getDetailArticle(Article $article, Security $security, SerializerInterface $serializer): Response
     {
-        if (!$security->isGranted('ROLE_ADMIN') || !$artcle->getIsPublished()) {
+        if (!$security->isGranted('ROLE_ADMIN') || !$article->getIsPublished()) {
 
             $jsonArticles = $serializer->serialize($article, 'json');
             return new Response($jsonArticles, Response::HTTP_OK, ['Content-Type' => 'application/json']);
@@ -69,14 +69,14 @@ class ArticleController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/articles/unpublished', methods: 'GET',  name: 'api_article_unpublished',)]
+    #[Route('/api/unpublished/articles/', methods: 'GET',  name: 'api_article_unpublished',)]
     public function getPublishedArtocme(ArticleRepository $articleRepository, SerializerInterface $serializer): Response
     {
 
         $articles = $articleRepository->findUnpublishedArticle();
         $jsonArticles = $serializer->serialize($articles, 'json');
 
-        return new Response($jsonArticles, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+        return new Response($jsonArticles, Response::HTTP_OK, ['Content-Type' => 'application/json']);
 
     }
 
