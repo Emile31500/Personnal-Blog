@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use Doctrine\ORM\EntityManager;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -68,15 +69,41 @@ class ArticleController extends AbstractController
         return new Response('', Response::HTTP_NOT_FOUND, ['Content-Type' => 'application/json']);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/unpublished/articles/', methods: 'GET',  name: 'api_article_unpublished',)]
-    public function getPublishedArtocme(ArticleRepository $articleRepository, SerializerInterface $serializer): Response
+    public function getUnpublishedArticLe(ArticleRepository $articleRepository, Security $security, SerializerInterface $serializer): Response
     {
 
-        $articles = $articleRepository->findUnpublishedArticle();
-        $jsonArticles = $serializer->serialize($articles, 'json');
+        if (!$security->isGranted('ROLE_ADMIN')) {
 
-        return new Response($jsonArticles, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+            return new Response('', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
+            
+        } else {
+
+            $articles = $articleRepository->findUnpublishedArticle();
+            $jsonArticles = $serializer->serialize($articles, 'json');
+
+            return new Response($jsonArticles, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+
+        }
+
+    }
+
+    #[Route('/api/articles/{id}', methods: 'DELETE',  name: 'api_delete_article',)]
+    public function deleteArticLe(Article $article, EntityManagerInterface $em, Security $security): Response
+    {
+
+        if (!$security->isGranted('ROLE_ADMIN')) {
+
+            return new Response('', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
+            
+        } else {
+
+            $em->remove($article);
+            $em->flush();
+
+            return new Response('', Response::HTTP_NO_CONTENT, ['Content-Type' => 'application/json']);
+
+        }
 
     }
 

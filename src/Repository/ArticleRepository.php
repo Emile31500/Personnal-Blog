@@ -66,4 +66,14 @@ class ArticleRepository extends ServiceEntityRepository
            ->getOneOrNullResult()
        ;
    }
+
+   public function findCount(): ?int
+   {
+         $count = $this->createQueryBuilder('a')
+            ->select('count(a.id)')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $count[1];
+   }
 }
