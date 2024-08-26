@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attibutes\Test;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class ArticleControllerTest extends WebTestCase
+final class ArticleControllerTest extends WebTestCase 
 {
     /**
      * @group unauth
@@ -24,21 +24,18 @@ final class ArticleControllerTest extends WebTestCase
         $articleRepository = static::getContainer()->get(ArticleRepository::class);
         $articles = $articleRepository->findPublishedArticle(1);
 
-        $i = 0;
-
-        do {
-
-            $article = $articles[$i];
-            $i++;
-
-        } while ($article->getIsPublished() === false);
+        $article = $articles[0];
 
         $id = $article->getId();
         $articleRepo = $articleRepository->findOneById($id);
         $client->request('GET', '/api/articles/'.$id);
+        var_dump(json_decode($client->getResponse(), true));
+        die;
        
-        $articleApi = json_decode($client->getResponse()->getContent(), true);
+        $articleApi = json_decode($client->getResponse(), true);
 
+        var_dump($articleApi);
+        die;
         $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
         $this->assertSame($articleRepo->getId(), $articleApi['id']);
 
@@ -73,7 +70,7 @@ final class ArticleControllerTest extends WebTestCase
 
         $client->request('GET', '/api/unpublished/articles/');
         
-        // $articlesApi = json_decode($client->getResponse()->getContent(), true);
+        // $articlesApi = json_decode($client->getResponse(), true);
         $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
 
     }
@@ -93,7 +90,7 @@ final class ArticleControllerTest extends WebTestCase
 
         $client->request('GET', '/api/unpublished/articles/');
 
-        $articlesApi = json_decode($client->getResponse()->getContent(), true);
+        $articlesApi = json_decode($client->getResponse(), true);
 
         $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
         foreach ($articlesApi as $article) {
@@ -181,6 +178,189 @@ final class ArticleControllerTest extends WebTestCase
         $deltedArticle = $articleRepository->findOneById($id);
         $this->assertSame(null, $deltedArticle);
         $this->assertSame(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @group unAuth
+     * @group post
+     * @group 403
+     */
+    public function testUnauthCreateArticles(): void 
+    {
+        $client = static::createClient();
+        $jsonData = json_encode([
+            'title'=> 'titre',
+            'content'=> 'mon article'.random_int(0, 1000),
+            'isPublished' => random_int(0, 1)
+        ]);
+
+        $client->request('POST', '/api/articles/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+
+        $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @group authUser
+     * @group post
+     * @group 403
+     */
+    public function testAuthUserCreateArticles(): void 
+    {
+
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneByEmail('user@emile.blog');
+        $client->loginUser($user);
+
+        $jsonData = json_encode([
+            'title'=> 'titre',
+            'content'=> 'mon article'.random_int(0, 1000),
+            'isPublished' => random_int(0, 1)
+        ]);
+
+        $client->request('POST', '/api/articles/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+
+        $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+        
+    }
+
+
+    /**
+     * @group authAdmin
+     * @group post
+     * @group 201
+     */
+    public function testAuthADminCreateArticles(): void 
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $admin = $userRepository->findOneByEmail('admin@emile.blog');
+        $client->loginUser($admin);
+
+        $jsonData = json_encode([
+            'title'=> 'titre',
+            'content'=> 'mon article'.random_int(0, 1000),
+            'isPublished' => random_int(0, 1)
+        ]);
+
+        $client->request('POST', '/api/articles/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+
+        $this->assertSame(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
+        
+    }
+
+    /**
+     * @group unAuth
+     * @group put
+     * @group 403
+     */
+    public function testUnauthEditArticles(): void 
+    {
+
+        $client = static::createClient();
+        $articleRepository = static::getContainer()->get(ArticleRepository::class);
+        $articles = $articleRepository->findAll();
+        $count = $articleRepository->findCount();
+        $index = random_int(0, $count-1);
+        $article = $articles[$index];
+        $id = $article->getId();
+
+        do {
+
+            $jsonData = json_encode([
+                'title'=> $article->getTitle(),
+                'content'=> 'Mon article mis à jour'.random_int(0, 1000),
+                'isPublished' => $article->getIsPublished()
+            ]);
+
+        } while (false);
+        // } while ($jsonData['content'] == $article->getContent());
+
+        $client->request('PUT', '/api/articles/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+        $unupdatedArticle = $articleRepository->findOneById($id);
+
+        $this->assertSame($unupdatedArticle->getContent(), $article->getContent());
+        $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+
+    }
+
+    /**
+     * @group authUser
+     * @group put
+     * @group 403
+     */
+    public function testAuthUserEditArticles(): void 
+    {
+
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $articleRepository = static::getContainer()->get(ArticleRepository::class);
+        $articles = $articleRepository->findAll();
+        $count = $articleRepository->findCount();
+        $index = random_int(0, $count-1);
+        $article = $articles[$index];
+        $id = $article->getId();
+
+        $user = $userRepository->findOneByEmail('user@emile.blog');
+        $client->loginUser($user);
+
+        do {
+
+            $jsonData = json_encode([
+                'title'=> $article->getTitle(),
+                'content'=> 'Mon article mis à jour'.random_int(0, 1000),
+                'isPublished' => $article->getIsPublished()
+            ]);
+
+        } while (false);
+        // } while ($jsonData['content'] == $article->getContent());
+
+        $client->request('PUT', '/api/articles/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+        $unupdatedArticle = $articleRepository->findOneById($id);
+
+        $this->assertSame($unupdatedArticle->getContent(), $article->getContent());
+        $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+        
+    }
+
+
+    /**
+     * @group authAdmin
+     * @group put
+     * @group 201
+     */
+    public function testAuthADminEditArticles(): void 
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $articleRepository = static::getContainer()->get(ArticleRepository::class);
+        $articles = $articleRepository->findAll();
+        $count = $articleRepository->findCount();
+        $index = random_int(0, $count-1);
+        $article = $articles[$index];
+        $id = $article->getId();
+        $originalArticleContent = $article->getContent();
+
+        $admin = $userRepository->findOneByEmail('admin@emile.blog');
+        $client->loginUser($admin);
+
+        do {
+
+            $jsonData = json_encode([
+                'title'=> $article->getTitle(),
+                'content'=> 'Mon article mis à jour n° '.random_int(0, 1000),
+                'isPublished' => $article->getIsPublished()
+            ]);
+
+        } while (false);
+        // } while ($jsonData['content'] == $article->getContent());
+
+        $client->request('PUT', '/api/articles/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+        $updatedArticle = $articleRepository->findOneById($id);
+
+        $this->assertNotSame($updatedArticle->getContent(), $originalArticleContent);
+        $this->assertSame(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
+        
     }
 
 
