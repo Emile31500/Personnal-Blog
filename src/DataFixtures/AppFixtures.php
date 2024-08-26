@@ -24,7 +24,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
 
-        for ($i = 0; $i < 5; $i++){
+        for ($i = 0; $i < 20; $i++){
 
             $unPubArticle[$i] = new Article();
             $unPubArticle[$i]->setTitle('Article non publié n° '.($i+1));

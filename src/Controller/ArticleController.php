@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ArticleController extends AbstractController
@@ -59,7 +60,7 @@ class ArticleController extends AbstractController
     #[Route('/api/articles/{id}', methods: 'GET',  name: 'api_article_detail')]
     public function getDetailArticle(Article $article, Security $security, SerializerInterface $serializer): Response
     {
-        if (!$security->isGranted('ROLE_ADMIN') || !$article->getIsPublished()) {
+        if ($security->isGranted('ROLE_ADMIN') || $article->getIsPublished()) {
 
             $jsonArticles = $serializer->serialize($article, 'json');
             return new Response($jsonArticles, Response::HTTP_OK, ['Content-Type' => 'application/json']);
@@ -107,23 +108,57 @@ class ArticleController extends AbstractController
 
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/articles/', methods: 'POST',  name: 'api_article_create',)]
-    public function postArticle(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): Response
+    public function postArticle(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator, Security $security): Response
     {
-        $article = $serializer->deserialize($request->getContent(), Article::class, 'json');
+        if ($security->isGranted('ROLE_ADMIN')) {
 
-        $errors = $validator->validate($article);
-        if (count($errors) > 0) {
-            $errorsString = (string) $errors;
+            $article = $serializer->deserialize($request->getContent(), Article::class, 'json');
+            $errors = $validator->validate($article);
 
-            return new Response($errorsString, Response::HTTP_BAD_REQUEST);
+            if (count($errors) > 0) {
+                $errorsString = (string) $errors;
+
+                return new Response($errorsString, Response::HTTP_BAD_REQUEST);
+            }
+            
+            $em->persist($article);
+            $em->flush();
+    
+            $jsonArticle = $serializer->serialize($article, 'json');
+            return new Response($jsonArticle, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+
+        } else {
+
+            return new Response('', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
+
         }
-        
-        $entityManager->persist($article);
-        $entityManager->flush();
- 
-        $jsonArticle = $serializer->serialize($article, 'json');
-        return new Response($jsonArticle, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/api/articles/{id}', methods: 'PUT',  name: 'api_article_edit',)]
+    public function editArticle(Article $article, Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator, Security $security): Response
+    {
+        if ($security->isGranted('ROLE_ADMIN')) {
+
+            $article = $serializer->deserialize($request->getContent(), Article::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $article]);
+            $errors = $validator->validate($article);
+
+            if (count($errors) > 0) {
+                $errorsString = (string) $errors;
+
+                return new Response($errorsString, Response::HTTP_BAD_REQUEST);
+            }
+            
+            $em->persist($article);
+            $em->flush();
+    
+            $jsonArticle = $serializer->serialize($article, 'json');
+            return new Response($jsonArticle, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+
+        } else {
+
+            return new Response('', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
+
+        }
     }
 }
