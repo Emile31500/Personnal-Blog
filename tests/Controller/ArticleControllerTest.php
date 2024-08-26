@@ -29,13 +29,9 @@ final class ArticleControllerTest extends WebTestCase
         $id = $article->getId();
         $articleRepo = $articleRepository->findOneById($id);
         $client->request('GET', '/api/articles/'.$id);
-        var_dump(json_decode($client->getResponse(), true));
-        die;
        
-        $articleApi = json_decode($client->getResponse(), true);
+        $articleApi = json_decode($client->getResponse()->getContent(), true);
 
-        var_dump($articleApi);
-        die;
         $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
         $this->assertSame($articleRepo->getId(), $articleApi['id']);
 
@@ -90,7 +86,7 @@ final class ArticleControllerTest extends WebTestCase
 
         $client->request('GET', '/api/unpublished/articles/');
 
-        $articlesApi = json_decode($client->getResponse(), true);
+        $articlesApi = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
         foreach ($articlesApi as $article) {
@@ -240,7 +236,7 @@ final class ArticleControllerTest extends WebTestCase
         $jsonData = json_encode([
             'title'=> 'titre',
             'content'=> 'mon article'.random_int(0, 1000),
-            'isPublished' => random_int(0, 1)
+            'isPublished' => (1 == random_int(0, 1))
         ]);
 
         $client->request('POST', '/api/articles/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
@@ -267,14 +263,14 @@ final class ArticleControllerTest extends WebTestCase
 
         do {
 
+            $newContent = 'Mon article mis à jour'.random_int(0, 1000);
             $jsonData = json_encode([
                 'title'=> $article->getTitle(),
-                'content'=> 'Mon article mis à jour'.random_int(0, 1000),
+                'content'=> $newContent,
                 'isPublished' => $article->getIsPublished()
-            ]);
+            ], true);
 
-        } while (false);
-        // } while ($jsonData['content'] == $article->getContent());
+        } while ($newContent == $article->getContent());
 
         $client->request('PUT', '/api/articles/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
         $unupdatedArticle = $articleRepository->findOneById($id);
@@ -306,14 +302,14 @@ final class ArticleControllerTest extends WebTestCase
 
         do {
 
+            $newContent = 'Mon article mis à jour'.random_int(0, 1000);
             $jsonData = json_encode([
                 'title'=> $article->getTitle(),
-                'content'=> 'Mon article mis à jour'.random_int(0, 1000),
+                'content'=> $newContent,
                 'isPublished' => $article->getIsPublished()
-            ]);
+            ], true);
 
-        } while (false);
-        // } while ($jsonData['content'] == $article->getContent());
+        } while ($newContent == $article->getContent());
 
         $client->request('PUT', '/api/articles/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
         $unupdatedArticle = $articleRepository->findOneById($id);
@@ -346,14 +342,15 @@ final class ArticleControllerTest extends WebTestCase
 
         do {
 
+            $newContent = 'Mon article mis à jour n° '.random_int(0, 1000);
             $jsonData = json_encode([
                 'title'=> $article->getTitle(),
-                'content'=> 'Mon article mis à jour n° '.random_int(0, 1000),
+                'content'=> $newContent,
                 'isPublished' => $article->getIsPublished()
-            ]);
+            ], true);
 
-        } while (false);
-        // } while ($jsonData['content'] == $article->getContent());
+
+        } while ($newContent == $article->getContent());
 
         $client->request('PUT', '/api/articles/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
         $updatedArticle = $articleRepository->findOneById($id);
