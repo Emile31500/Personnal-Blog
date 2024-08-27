@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ProjectRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
@@ -13,21 +14,27 @@ class Project
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
+    #[Groups(['project'])]
     private $id;
 
+    #[Groups(['project'])]
     #[ORM\Column(type: "string", length: 255)]
     private $title;
 
+    #[Groups(['project'])]
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $github_link;
 
+    #[Groups(['project'])]
     #[ORM\Column(type: "text")]
     private $content;
 
+    #[Groups(['project'])]
     #[ORM\Column(type: "boolean")]
     private $isPublished;
 
-    #[ORM\OneToMany(targetEntity: ProjectMedia::class, mappedBy: "id_project")]
+    #[Groups(['project'])]
+    #[ORM\OneToMany(targetEntity: ProjectMedia::class, mappedBy: "project")]
     private $media;
 
     public function __construct()

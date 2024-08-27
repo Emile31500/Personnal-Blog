@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ controller_name }} {% endblock %}
+
+{% block body %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+    
+        <div class='p-3 my-3 horizontal-scroll' style="box-shadow: 0 0.4em 1em grey;" id='unpublishedArticleZone'>
+
+            
+        </div>
+
+    {% endif %}
+
+    {% for project in projects %}
+        
+            <div class="row p-3 my-3" style="box-shadow: 0 0.1em 1em grey;">
+                <div class="col-4">
+                    <h3 class="fs-4"> {{project.title}}</h3>
+                </div>
+                <div class="col-8">
+                    <p> {{project.content|slice(0, 200) }} ... </p>
+                    <a class='btn btn-outline-primary' href="/projects/{{project.id}}"> Continuer à lire</a> 
+                </div>
+            </div>
+
+    {% endfor %}
+
+{% endblock %}
+{% block stylesheets %}
+
+    <style>
+
+        .horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+        }
+        
+    </style>
+
+{% endblock %}
+{% block javascript %}
+    <script src="{{ asset('/JS/Article/laodUnpublished.js') }}"></script>
+{% endblock %}
