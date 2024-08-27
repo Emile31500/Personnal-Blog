@@ -31,28 +31,49 @@ class ProjectRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Project[] Returns an array of Project objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findByUnpublishedProject(int $page = 0): array
+    {
 
-//    public function findOneBySomeField($value): ?Project
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        // ->from(Project::class, 'p')
+        $result = $this->createQueryBuilder('p') 
+            ->andWhere('p.isPublished = :val')
+            ->setParameter('val', false)
+            ->setMaxResults(10)
+            ->setFirstResult($page)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+        //  ->join('p.media','pm')
+    }
+
+    public function findByPublishedProject(int $page = 0): array
+    {
+
+        // ->from(Project::class, 'p')
+        $result = $this->createQueryBuilder('p')
+            ->join('p.media','pm')
+            ->andWhere('p.isPublished = :val')
+            ->setParameter('val', true)
+            ->setMaxResults(10)
+            ->setFirstResult($page)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+        //  ->join('p.media','pm')
+    }
+
+    public function findOneById(int $id): ?Project
+    {
+        $result = $this->createQueryBuilder('p')
+            ->join('p.media','pm')
+            ->andWhere('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+            // ->from(Project::class, 'p')
+
+        return $result;
+    }
 }

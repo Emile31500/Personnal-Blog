@@ -11,12 +11,14 @@ class ProjectMedia
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
+    #[Groups(['project'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: "name")]
-    private $id_project;
+    private $project;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Groups(['project'])]
     private $name;
 
     public function getId(): ?int
@@ -26,12 +28,12 @@ class ProjectMedia
 
     public function getIdProject(): ?Project
     {
-        return $this->id_project;
+        return $this->project;
     }
 
-    public function setIdProject(?Project $id_project): self
+    public function setIdProject(?Project $project): self
     {
-        $this->id_project = $id_project;
+        $this->project = $project;
 
         return $this;
     }
