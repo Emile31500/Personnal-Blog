@@ -113,7 +113,7 @@ final class ProjectControllerTest extends WebTestCase {
                 'isPublished' =>(1 ==random_int(0, 1))
             ], true);
         
-            $client->request('POST', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+            $client->request('POST', '/api/projects/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
 
             $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
         }
@@ -140,7 +140,7 @@ final class ProjectControllerTest extends WebTestCase {
             $user = $userRepository->findOneByEmail('user@emile.blog');
             $client->loginUser($user);
 
-            $client->request('POST', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+            $client->request('POST', '/api/projects/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
 
             $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
 
@@ -168,7 +168,7 @@ final class ProjectControllerTest extends WebTestCase {
             $user = $userRepository->findOneByEmail('admin@emile.blog');
             $client->loginUser($user);
 
-            $client->request('POST', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+            $client->request('POST', '/api/projects/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
 
             $projectApi = json_decode($client->getResponse()->getContent(), true);
 

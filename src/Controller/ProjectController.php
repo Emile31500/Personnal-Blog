@@ -26,7 +26,7 @@ class ProjectController extends AbstractController
         $projects = $projectRepository->findPublishedProject($index_page-1);
 
         return $this->render('project/list.html.twig', [
-            'controller_name' => 'Articles',
+            'controller_name' => 'Projets',
             'projects' => $projects
         ]);
     }
@@ -113,7 +113,7 @@ class ProjectController extends AbstractController
     {
         if ($security->isGranted('ROLE_ADMIN')) {
 
-            $project = $serializer->deserialize($request->getContent(), Article::class, 'json');
+            $project = $serializer->deserialize($request->getContent(), Project::class, 'json');
             $errors = $validator->validate($project);
 
             if (count($errors) > 0) {
@@ -125,8 +125,8 @@ class ProjectController extends AbstractController
             $em->persist($project);
             $em->flush();
     
-            $jsonArticle = $serializer->serialize($project, 'json');
-            return new Response($jsonArticle, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+            $jsonProject = $serializer->serialize($project, 'json', ['groups' => 'project']);
+            return new Response($jsonProject, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
 
         } else {
 
@@ -140,7 +140,7 @@ class ProjectController extends AbstractController
     {
         if ($security->isGranted('ROLE_ADMIN')) {
 
-            $project = $serializer->deserialize($request->getContent(), Article::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $project]);
+            $project = $serializer->deserialize($request->getContent(), Project::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $project]);
             $errors = $validator->validate($project);
 
             if (count($errors) > 0) {
@@ -152,8 +152,8 @@ class ProjectController extends AbstractController
             $em->persist($project);
             $em->flush();
     
-            $jsonArticle = $serializer->serialize($project, 'json');
-            return new Response($jsonArticle, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+            $jsonProject = $serializer->serialize($project, 'json');
+            return new Response($jsonProject, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
 
         } else {
 
