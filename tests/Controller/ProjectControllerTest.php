@@ -9,16 +9,53 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class ProjectControllerTest extends WebTestCase {
 
+
         /**
          * @group unAuth
          * @group get
-         * @group 200
+         * @group 403
          * */
-        public function testGetPublishedProjectsUnAuth() : void
+        public function testGetUnpublishedProjectsUnauth() : void
         {
             $client = static::createClient();
 
-            $client->request('GET', '/api/projects/');
+            $client->request('GET', '/api/unpublished/projects/');
+
+            $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+
+        }  
+    
+        /**
+         * @group autUser
+         * @group get
+         * @group 403
+         * */
+        public function testGetUnpublishedProjectsAuthUser() : void
+        {
+            $client = static::createClient();
+
+            $userRepository = static::getContainer()->get(UserRepository::class);
+            $user = $userRepository->findOneByEmail('user@emile.blog');
+            $client->loginUser($user);
+            $client->request('GET', '/api/unpublished/projects/');
+
+            $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+
+        }
+
+        /**
+         * @group authAdmin
+         * @group get
+         * @group 200
+         * */
+        public function testGetUnpublishedProjectsAuthAdmin() : void
+        {
+            $client = static::createClient();
+
+            $userRepository = static::getContainer()->get(UserRepository::class);
+            $user = $userRepository->findOneByEmail('admin@emile.blog');
+            $client->loginUser($user);
+            $client->request('GET', '/api/unpublished/projects/');
         
             $projectsApi = json_decode($client->getResponse()->getContent(), true);
 
@@ -27,7 +64,7 @@ final class ProjectControllerTest extends WebTestCase {
             foreach ($projectsApi as $projectApi) {
 
                 $this->assertIsInt($projectApi['id']);
-                $this->assertTrue($projectApi['isPublished']);
+                $this->assertFalse($projectApi['isPublished']);
 
             }
         }
@@ -41,7 +78,7 @@ final class ProjectControllerTest extends WebTestCase {
         {
             $client = static::createClient();
             $projectRepository = static::getContainer()->get(ProjectRepository::class);
-            $projects = $projectRepository->findPublishedProject(1);
+            $projects = $projectRepository->findByPublishedProject(0);
 
             $project = $projects[0];
 
@@ -52,7 +89,7 @@ final class ProjectControllerTest extends WebTestCase {
             $projectApi = json_decode($client->getResponse()->getContent(), true);
 
             $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
-            $this->assertSame($projectRepo->getId(), $projectApi['id']);
+            $this->assertSame($projectRepo->getTitle(), $projectApi['title']);
             $this->assertTrue($projectApi['isPublished']);
 
         }
@@ -100,8 +137,8 @@ final class ProjectControllerTest extends WebTestCase {
             ], true);
 
             $userRepository = static::getContainer()->get(UserRepository::class);
-            $user = $userRepository->findByUsername('user@emile.blog');
-            $client->login($user);
+            $user = $userRepository->findOneByEmail('user@emile.blog');
+            $client->loginUser($user);
 
             $client->request('POST', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
 
@@ -128,8 +165,8 @@ final class ProjectControllerTest extends WebTestCase {
             ], true);
         
             $userRepository = static::getContainer()->get(UserRepository::class);
-            $user = $userRepository->findByUsername('admin@emile.blog');
-            $client->login($user);
+            $user = $userRepository->findOneByEmail('admin@emile.blog');
+            $client->loginUser($user);
 
             $client->request('POST', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
 
