@@ -58,17 +58,20 @@ class AppFixtures extends Fixture
         $admin->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
         $manager->persist($admin);
 
-        $media = new ProjectMedia();
-        $media->setName('icone-p6.png');
-        
-        $ocrSix = new Project();
-        $ocrSix->setTitle('OCR 6');
-        $ocrSix->setGithubLink('https://github.com/Emile31500/OCR_6');
-        $ocrSix->setContent('<h2>Context</h2><p><br>Ce projet a été réalisé dans le cadre de ma formation OpenClassrooms.</br>Jimmy Sweat est un entrepreneur qui souhaite créer un site communautaire pour faire découvrir le snowboard et aider les novices à apprendre les différentes figures.</br></br>Le site devait être réalisé avec Symfony. Les seuls codes externes autorisés étaient Bootstrap et les bibliothèques de Composer. Des wireframes à respecter étaient également fournis par OCR.</br></p><h1>Information pour l\'instalation :</h1><h2>Importer le projet</h2><p>Ouvrez votre terminal de commande en mode sudo et éxecutez la commande suivante pour téléchargez le projet :<code>$ git clone https://github.com/Emile31500/OCR_6_Developpez-de-A-a-Z-le-site-communautaire-SnowTricks</code></p><h2>Configuration de la Base de Données</h2><p><br>Dans le fichier : ../root/.env</br></br>App : nom d\'utilisateur de la base de données</br>!ChangeME! : mot de passe de cet utilisateur</br>127.0.0.1:3306 : addresse et port utilisé par votre BDD</br>app : le nom de la base de données (ici snow_tricks)</br></p><pre><code> # DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=8.0.32&charset=utf8mb4"</code></pre><p>Créez une base de données que vous appellerez snow_trikcsImporter la base de données dans le dossier suivant <code>../root/Diagrammes/SnowTricks.sql</code>Démarrez le serveur web avec:<code>$ php -S 127.0.0.1:8100 -t public</code></p><h2>À savoir</h2><p><span style="color: rgb(255, 0, 0)">La récupération de mot de passe ne fonctionne pas tant que le site ne sera pas définitivement déployé : </span><br>Lien de modificaton est normalement</br><code>ip.server:port/modifier-le-mot-de-passe/{mot_de_passe}</code></br>On est obligé d\'envoyer une addresse absolue, par défaut on envoie donc</br><code>127.0.0.1:8100/modifier-le-mot-de-passe/{mot_de_passe}</code> </br><b>Lorsque vous recevrez ce lien il faudra changer l\'addresse du server selon la votre</b></p>');
-        $ocrSix->addProjectMedia($media);
-        $ocrSix->setIsPublished(true);
-        $manager->persist($media);
-        $manager->persist($ocrSix);
+        for ($i = 0; $i < 10; $i++){
+
+            $media[$i] = new ProjectMedia();
+            $media[$i]->setName('icone-p6-n-'.$i.'.png');
+
+            $ocrSix[$i] = new Project();
+            $ocrSix[$i]->setTitle('OCR 6 n°'.$i);
+            $ocrSix[$i]->setGithubLink('https://github.com/Emile31500/OCR_6');
+            $ocrSix[$i]->setContent('<h2>Context</h2><p><br>Ce projet a été réalisé dans le cadre de ma formation OpenClassrooms.</br>Jimmy Sweat est un entrepreneur qui souhaite créer un site communautaire pour faire découvrir le snowboard et aider les novices à apprendre les différentes figures.</br></br>Le site devait être réalisé avec Symfony. Les seuls codes externes autorisés étaient Bootstrap et les bibliothèques de Composer. Des wireframes à respecter étaient également fournis par OCR.</br></p><h1>Information pour l\'instalation :</h1><h2>Importer le projet</h2><p>Ouvrez votre terminal de commande en mode sudo et éxecutez la commande suivante pour téléchargez le projet :<code>$ git clone https://github.com/Emile31500/OCR_6_Developpez-de-A-a-Z-le-site-communautaire-SnowTricks</code></p><h2>Configuration de la Base de Données</h2><p><br>Dans le fichier : ../root/.env</br></br>App : nom d\'utilisateur de la base de données</br>!ChangeME! : mot de passe de cet utilisateur</br>127.0.0.1:3306 : addresse et port utilisé par votre BDD</br>app : le nom de la base de données (ici snow_tricks)</br></p><pre><code> # DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=8.0.32&charset=utf8mb4"</code></pre><p>Créez une base de données que vous appellerez snow_trikcsImporter la base de données dans le dossier suivant <code>../root/Diagrammes/SnowTricks.sql</code>Démarrez le serveur web avec:<code>$ php -S 127.0.0.1:8100 -t public</code></p><h2>À savoir</h2><p><span style="color: rgb(255, 0, 0)">La récupération de mot de passe ne fonctionne pas tant que le site ne sera pas définitivement déployé : </span><br>Lien de modificaton est normalement</br><code>ip.server:port/modifier-le-mot-de-passe/{mot_de_passe}</code></br>On est obligé d\'envoyer une addresse absolue, par défaut on envoie donc</br><code>127.0.0.1:8100/modifier-le-mot-de-passe/{mot_de_passe}</code> </br><b>Lorsque vous recevrez ce lien il faudra changer l\'addresse du server selon la votre</b></p>');
+            $ocrSix[$i]->addProjectMedia($media[$i]);
+            $ocrSix[$i]->setIsPublished(true);
+            $manager->persist($media[$i]);
+            $manager->persist($ocrSix[$i]);
+        }
 
         $manager->flush();
     }

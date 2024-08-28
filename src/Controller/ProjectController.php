@@ -6,6 +6,7 @@ use App\Entity\Project;
 use Doctrine\ORM\EntityManager;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ProjectMediaRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -90,19 +91,26 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/api/projects/{id}', methods: 'DELETE',  name: 'api_delete_project',)]
-    public function deleteProject(Project $project, EntityManagerInterface $em, Security $security): Response
+    public function deleteProject(Project $project, EntityManagerInterface $em, Security $security, ProjectMediaRepository $projectMediaRepository): Response
     {
 
-        if (!$security->isGranted('ROLE_ADMIN')) {
+        if ($security->isGranted('ROLE_ADMIN')) {
 
-            return new Response('', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
+            $mediaProjects = $projectMediaRepository->findAllByProject($project);
             
-        } else {
+            foreach ($mediaProjects as $mediaProject)
+            {
+                $em->remove($mediaProject);
+            }
 
             $em->remove($project);
             $em->flush();
 
             return new Response('', Response::HTTP_NO_CONTENT, ['Content-Type' => 'application/json']);
+            
+        } else {
+
+            return new Response('', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
 
         }
 
