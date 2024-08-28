@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Project;
 use App\Entity\ProjectMedia;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class ProjectMediaRepository extends ServiceEntityRepository
 {
@@ -34,17 +35,16 @@ class ProjectMediaRepository extends ServiceEntityRepository
     /**
      * @return ProjectMedia[] Returns an array of ProjectMedia objects
      */
-    // public function findByExampleField($value): array
-    // {
-    //     return $this->createQueryBuilder('p')
-    //         ->andWhere('p.exampleField = :val')
-    //         ->setParameter('val', $value)
-    //         ->orderBy('p.id', 'ASC')
-    //         ->setMaxResults(10)
-    //         ->getQuery()
-    //         ->getResult()
-    //     ;
-    // }
+    public function findAllByProject(Project $project): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.project = :id')
+            ->setParameter('id', $project->getId())
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     // public function findOneBySomeField($value): ?ProjectMedia
     // {

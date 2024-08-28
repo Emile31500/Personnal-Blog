@@ -4,6 +4,7 @@ namespace Tests\Controller;
 
 use App\Repository\UserRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\ProjectMediaRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -53,8 +54,8 @@ final class ProjectControllerTest extends WebTestCase {
             $client = static::createClient();
 
             $userRepository = static::getContainer()->get(UserRepository::class);
-            $user = $userRepository->findOneByEmail('admin@emile.blog');
-            $client->loginUser($user);
+            $admin = $userRepository->findOneByEmail('admin@emile.blog');
+            $client->loginUser($admin);
             $client->request('GET', '/api/unpublished/projects/');
         
             $projectsApi = json_decode($client->getResponse()->getContent(), true);
@@ -165,8 +166,8 @@ final class ProjectControllerTest extends WebTestCase {
             ], true);
         
             $userRepository = static::getContainer()->get(UserRepository::class);
-            $user = $userRepository->findOneByEmail('admin@emile.blog');
-            $client->loginUser($user);
+            $admin = $userRepository->findOneByEmail('admin@emile.blog');
+            $client->loginUser($admin);
 
             $client->request('POST', '/api/projects/', [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
 
@@ -186,6 +187,28 @@ final class ProjectControllerTest extends WebTestCase {
         public function testDeleteProjectDetailUnAuth() : void
         {
 
+            $client = static::createClient();    
+
+            $projectRepository = static::getContainer()->get(ProjectRepository::class);
+            $projects = $projectRepository->findByPublishedProject();
+            $project = $projects[0];
+            $id = $project->getId();
+
+            $projectMediaRepository = static::getContainer()->get(ProjectMediaRepository::class);
+            $mediaProjects = $projectMediaRepository->findAllByProject($project);
+            $mediaProject = $mediaProjects[0];
+
+            $client->request('DELETE', '/api/projects/'.$id);
+
+            $nonDeletedProject = $projectRepository->findOneById($id);
+            $nonDeletedMediaProject = $projectMediaRepository->findOneById($id);
+
+
+            $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+            $this->assertSame($project, $nonDeletedProject);
+            $this->assertSame($mediaProject, $nonDeletedMediaProject);
+
+
         }
 
         
@@ -197,6 +220,32 @@ final class ProjectControllerTest extends WebTestCase {
         public function testDeleteProjectDetailAuthUser() : void
         {
 
+            $client = static::createClient();    
+
+            $userRepository = static::getContainer()->get(UserRepository::class);
+            $user = $userRepository->findOneByEmail('user@emile.blog');
+            $client->loginUser($user);
+
+            $projectRepository = static::getContainer()->get(ProjectRepository::class);
+            $projects = $projectRepository->findByPublishedProject();
+            $project = $projects[0];
+            $id = $project->getId();
+
+            $projectMediaRepository = static::getContainer()->get(ProjectMediaRepository::class);
+            $mediaProjects = $projectMediaRepository->findAllByProject($project);
+            $mediaProject = $mediaProjects[0];
+
+
+            $client->request('DELETE', '/api/projects/'.$id);
+
+            $nonDeletedProject = $projectRepository->findOneById($id);
+            $nonDeletedMediaProject = $projectMediaRepository->findOneById($id);
+
+            $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+            $this->assertSame($project, $nonDeletedProject);
+            $this->assertSame($mediaProject, $nonDeletedMediaProject);
+
+
         }
 
         
@@ -207,6 +256,31 @@ final class ProjectControllerTest extends WebTestCase {
          * */
         public function testDeleteProjectDetailAuthAdmin() : void
         {
+
+            $client = static::createClient();    
+
+            $userRepository = static::getContainer()->get(UserRepository::class);
+            $admin = $userRepository->findOneByEmail('admin@emile.blog');
+            $client->loginUser($admin);
+
+            $projectRepository = static::getContainer()->get(ProjectRepository::class);
+            $projects = $projectRepository->findByPublishedProject();
+            $project = $projects[0];
+            $id = $project->getId();
+
+            $projectMediaRepository = static::getContainer()->get(ProjectMediaRepository::class);
+            $mediaProjects = $projectMediaRepository->findAllByProject($project);
+            $mediaProject = $mediaProjects[0];
+
+            $client->request('DELETE', '/api/projects/'.$id);
+
+            $deletedProject = $projectRepository->findOneById($id);
+            $deletedMediaProject = $projectMediaRepository->findOneById($id);
+
+            $this->assertSame(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());
+            $this->assertNull($deletedProject);
+            $this->assertNull($deletedMediaProject);
+
 
         }
 
