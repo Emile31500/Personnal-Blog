@@ -291,6 +291,28 @@ final class ProjectControllerTest extends WebTestCase {
          * */
         public function testUpdateProjectDetailUnAuth() : void
         {
+            $client = static::createClient();    
+
+            $projectRepository = static::getContainer()->get(ProjectRepository::class);
+            $projects = $projectRepository->findByPublishedProject();
+            $project = $projects[0];
+            $id = $project->getId();
+
+            $num = random_int(0, 1000);
+            $jsonData = json_encode([
+                'title' => 'Projet MàJ n°'.$num, 
+                'githubLink' => 'https://github.com/Emile31500/Project-'.$num, 
+                'content' => 'Voici le contenu du projet mis à jour numéro n° '.$num , 
+                'isPublished' =>(1 ==random_int(0, 1))
+            ], true);
+        
+            $client->request('PUT', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+
+            $nonupdatedProjects = $projectRepository->findOneById($id);
+
+
+            $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+            $this->assertSame($project->getTitle(), $nonupdatedProjects->getTitle());
 
         }
 
@@ -303,6 +325,33 @@ final class ProjectControllerTest extends WebTestCase {
         public function testUpdateProjectDetailAuthUser() : void
         {
 
+            $client = static::createClient();    
+
+            $projectRepository = static::getContainer()->get(ProjectRepository::class);
+            $projects = $projectRepository->findByPublishedProject();
+            $project = $projects[0];
+            $id = $project->getId();
+
+            $userRepository = static::getContainer()->get(UserRepository::class);
+            $user = $userRepository->findOneByEmail('user@emile.blog');
+            $client->loginUser($user);
+
+            $num = random_int(0, 1000);
+            $jsonData = json_encode([
+                'title' => 'Projet MàJ n°'.$num, 
+                'githubLink' => 'https://github.com/Emile31500/Project-'.$num, 
+                'content' => 'Voici le contenu du projet mis à jour numéro n° '.$num , 
+                'isPublished' =>(1 ==random_int(0, 1))
+            ], true);
+        
+            $client->request('PUT', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+
+            $nonupdatedProjects = $projectRepository->findOneById($id);
+
+
+            $this->assertSame(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+            $this->assertSame($project->getTitle(), $nonupdatedProjects->getTitle());
+
         }
 
         
@@ -313,6 +362,37 @@ final class ProjectControllerTest extends WebTestCase {
          * */
         public function testUpdateProjectDetailAuthAdmin() : void
         {
+
+            $client = static::createClient();    
+
+            $projectRepository = static::getContainer()->get(ProjectRepository::class);
+            $projects = $projectRepository->findByPublishedProject();
+            $project = $projects[0];
+            $id = $project->getId();
+            $originalTitle = $project->getTitle();
+
+            $userRepository = static::getContainer()->get(UserRepository::class);
+            $admin = $userRepository->findOneByEmail('admin@emile.blog');
+            $client->loginUser($admin);
+
+            $num = random_int(0, 1000);
+            $updatedTitle = 'Projet MàJ n°'.$num;
+            $jsonData = json_encode([
+                'title' => $updatedTitle, 
+                'githubLink' => 'https://github.com/Emile31500/Project-'.$num, 
+                'content' => 'Voici le contenu du projet mis à jour numéro n° '.$num , 
+                'isPublished' =>(1 ==random_int(0, 1))
+            ], true);
+        
+            $client->request('PUT', '/api/projects/'.$id, [], [], ['CONTENT_TYPE' => 'application/json'], $jsonData);
+
+            $updatedProject = $projectRepository->findOneById($id);
+
+
+            $this->assertSame(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
+            $this->assertNotSame($originalTitle, $updatedProject->getTitle());
+            $this->assertSame($updatedTitle, $updatedProject->getTitle());
+
 
         }
 

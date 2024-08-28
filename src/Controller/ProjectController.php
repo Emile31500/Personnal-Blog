@@ -160,7 +160,7 @@ class ProjectController extends AbstractController
             $em->persist($project);
             $em->flush();
     
-            $jsonProject = $serializer->serialize($project, 'json');
+            $jsonProject = $serializer->serialize($project, 'json', ['groups' => 'project']);
             return new Response($jsonProject, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
 
         } else {
