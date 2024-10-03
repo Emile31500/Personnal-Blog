@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Media;
+use DateTimeImmutable;
 use App\Entity\Article;
+use App\Form\ArticlesFileType;
 use Doctrine\ORM\EntityManager;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,17 +46,40 @@ class ArticleController extends AbstractController
     #[Route('/articles/{id_article}/edition',  name: 'app_article_edit',)]
     public function articleEdition(): Response
     {
+
         return $this->render('article/edit.html.twig', [
             'controller_name' => 'Edition',
         ]);
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/articles/create',  name: 'app_article_create',)]
-    public function articleCreate(): Response
+    #[Route('/articles/create',  methods: ['GET', 'POST'], name: 'app_article_create',)]
+    public function articleCreate(Request $request, EntityManagerInterface $em): Response
     {
+
+        $form = $this->createForm(ArticlesFileType::class);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $file = $data['file'];
+            $randomName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'-'.uniqid().'.'.$file->guessExtension();
+            $file->move('Media/', $randomName);
+
+            $media = new Media();
+            $media->setName($randomName)
+                ->setCreatedAt(new DateTimeImmutable);
+
+            $em->persist($media);
+            $em->flush();
+        }
+
+        $medias = $em->getRepository(Media::class)->findBy(["deleted" => null]);
+
         return $this->render('article/create.html.twig', [
+            'article_form' => $form->createView(),
             'controller_name' => 'Nouvel article',
+            'medias' => $medias
         ]);
     }
 

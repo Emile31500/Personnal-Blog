@@ -3,14 +3,52 @@
 {% block title %} {{ controller_name }} {% endblock %}
 
 {% block body %}
-
-    <!-- Include stylesheet -->
-
-    <!-- Create the editor container -->
-
-    
     <h2 class='my-5'> {{ controller_name }} </h2>
+    {# <div class="border px-1 pt-3"> #}
+    <div class="row">
+        <div class="col">
+            {{form_start(article_form)}}
+                <p>
+                    <label for="{{field_name(article_form.file)}}">
+                    Importer un fichier : 
+                    </label>
+                </p>
+                <p>
+                    <input type="file" class="form-control" id="{{field_name(article_form.file)}}" name="{{field_name(article_form.file)}}" />
+                    </p>
+                <p>
+                    <input type="submit" class="btn btn-outline-primary"/>
+                </p>
+            {{form_end(article_form)}}
+        </div>
+        <div style="min-height: 100px;" class="col px-5 pb-3 border border-start-0 border-end-0">
+                {% if medias|length <= 0 %}
 
+                    <span class="text-muted fw-light fst-italic">aucun fichiers importé pour l'instant ...</span>
+
+                {% else %}
+                    <div class="card-group overflow-auto">
+                        {% for media in medias %}
+
+                            <div style='height: 200px; background-image: url("{{asset('/Media/'~ media.name)}}");' class="my-1 mx-3 card">
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <button class="btn btn-primary copy-clipboard-btn" data-clipboard-message="L'image de nom {{media.name}} a bien été copier dans votre presse-papiers.<br>Vous pouvez l'ajouter à cette article en le collant dans le texte de ce dernier." data-clipboard-content="<img class='w-75 d-block mx-auto' src='{{asset('/Media/'~ media.name)}}'/>">
+                                            Copier
+                                        </button>
+                                        <button class="btn btn-outline-danger" >
+                                            Supprimer
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                {% endif %}
+        </div>
+    </div>
+    <button class="my-3 btn btn-secondary-outline visualize-btn" data-target-visualize="#editor > div.ql-editor">Visualiser </button>
     <form>
         <div class='my-3'>
             <label for='title' required> Titre : </label>
@@ -24,27 +62,27 @@
     </form>
     <button id='save' class='mx-2 my-3 btn btn-outine-primary'>Sauvegarder</button>
     <button id='publish' class='mx-2 my-3 btn btn-primary'>Publier</button>
-
-    
-
-    <!-- Include the Quill library -->
-
-    <!-- Initialize Quill editor -->
-    
+    <dialog id='visualizer' style="width: 80%;">
+        <div class="visualiser-header"><button class="btn btn-danger close">x</button></div>
+        <div class="visualiser-conten w-80">
+            <div class='container'>
+                <h2 class='my-5 visualizer-article-title'></h2>
+                <div class='my-3 visualizer-article-content'></div>
+            <div>
+        </div>
+    <dialog>
 {% endblock %}
-
 {% block stylesheets %}
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 {% endblock %}
-
 {% block javascript %}
-
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script>
         const quill = new Quill('#editor', {
             theme: 'snow'
         });
     </script>
+    <script src="{{ asset('/JS/Article/visualize.js') }}"></script>
     <script src="{{ asset('/JS/Article/save.js') }}"></script>
-
+    <script src="{{ asset('/JS/Article/copyClipboard.js') }}"></script>
 {% endblock %}
