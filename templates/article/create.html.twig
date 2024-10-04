@@ -49,7 +49,7 @@
         </div>
     </div>
     <button class="my-3 btn btn-secondary-outline visualize-btn" data-target-visualize="#editor > div.ql-editor">Visualiser </button>
-    <form>
+    <form class="article-form">
         <div class='my-3'>
             <label for='title' required> Titre : </label>
             <br>
@@ -62,6 +62,10 @@
     </form>
     <button id='save' class='mx-2 my-3 btn btn-outine-primary'>Sauvegarder</button>
     <button id='publish' class='mx-2 my-3 btn btn-primary'>Publier</button>
+    <div class="alert" >
+        <b class="alert-type"> :</b>
+        <p class="alert-message"></p>
+    </div>
     <dialog id='visualizer' style="width: 80%;">
         <div class="visualiser-header"><button class="btn btn-danger close">x</button></div>
         <div class="visualiser-conten w-80">
@@ -85,4 +89,6 @@
     <script src="{{ asset('/JS/Article/visualize.js') }}"></script>
     <script src="{{ asset('/JS/Article/save.js') }}"></script>
     <script src="{{ asset('/JS/Article/copyClipboard.js') }}"></script>
+    <script src="{{ asset('/JS/Article/preSubmitChecker.js') }}"></script>
+
 {% endblock %}

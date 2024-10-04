@@ -140,6 +140,12 @@ class ArticleController extends AbstractController
         if ($security->isGranted('ROLE_ADMIN')) {
 
             $article = $serializer->deserialize($request->getContent(), Article::class, 'json');
+            if (str_contains($article->getContent(), '<script')){
+
+                return new Response('Certain élément HTML sont complètement interdit. Enlever-les pour pour pouvoir enregistrer cet article.', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
+
+            }
+
             $errors = $validator->validate($article);
 
             if (count($errors) > 0) {

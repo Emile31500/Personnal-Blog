@@ -8,12 +8,7 @@ save.addEventListener('click', async function(event){
     event.preventDefault();
     const title = titleEl.value;
     const content = contentEl.innerHTML;
-
-    console.log(title)
-    console.log(content)
-
-
-
+    
     const raw = JSON.stringify({
         title : title,
         content : content,
