@@ -25,12 +25,12 @@ publishButton.addEventListener('click', async function (event) {
     }
 
     let request = {
-        method: 'POST',
+        method: articleSubmitMethod,
         headers:{'Content-Type': 'application/json'},
         body: raw
     };
 
-    await fetch('http://127.0.0.1:8000/api/articles/', request)
+    await fetch(articleSubmitUrl, request)
     .then(response => { 
 
         if (response.status == 201) {
