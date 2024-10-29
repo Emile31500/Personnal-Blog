@@ -43,12 +43,36 @@ class ArticleController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/articles/{id_article}/edition',  name: 'app_article_edit',)]
-    public function articleEdition(): Response
+    #[Route('/articles/{id}/edition',  methods: ["GET", "POST"],name: 'app_article_edit',)]
+    public function articleEdition(Article $article, Request $request, EntityManagerInterface $em): Response
     {
 
+        $form = $this->createForm(ArticlesFileType::class);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $file = $data['file'];
+            $randomName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'-'.uniqid().'.'.$file->guessExtension();
+            $file->move('Media/', $randomName);
+
+            $media = new Media();
+            $media->setName($randomName)
+                ->setCreatedAt(new DateTimeImmutable);
+
+            $em->persist($media);
+            $em->flush();
+        }
+
+        $medias = $em->getRepository(Media::class)->findBy(["deleted" => null]);
+
+
         return $this->render('article/edit.html.twig', [
+            'article_form' => $form->createView(),
             'controller_name' => 'Edition',
+            'medias' => $medias,
+            'article' => $article
+
         ]);
     }
 
@@ -140,6 +164,12 @@ class ArticleController extends AbstractController
         if ($security->isGranted('ROLE_ADMIN')) {
 
             $article = $serializer->deserialize($request->getContent(), Article::class, 'json');
+            if (str_contains($article->getContent(), '<script')){
+
+                return new Response('Certain élément HTML sont complètement interdit. Enlever-les pour pour pouvoir enregistrer cet article.', Response::HTTP_FORBIDDEN, ['Content-Type' => 'application/json']);
+
+            }
+
             $errors = $validator->validate($article);
 
             if (count($errors) > 0) {

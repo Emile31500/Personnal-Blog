@@ -21,6 +21,7 @@
                 </p>
             {{form_end(article_form)}}
         </div>
+        <span id='articleIdElement'>{{article.id}}<span>
         <div style="min-height: 100px;" class="col px-5 pb-3 border border-start-0 border-end-0">
                 {% if medias|length <= 0 %}
 
@@ -48,8 +49,8 @@
                 {% endif %}
         </div>
     </div>
-    <button class="my-3 btn btn-secondary-outline visualize-btn" data-target-visualize="#editor > div.ql-editor">Visualiser </button>
-    <form>
+    <button class="my-3 btn btn-secondary-outline visualize-btn" data-target-visualize="#editor > div.ql-editor"> <i class="fa-solid fa-eye"></i> Visualiser </button>
+    <form class="article-form">
         <div class='my-3'>
             <label for='title' required> Titre : </label>
             <br>
@@ -60,8 +61,12 @@
         <div id="editor">
         </div>
     </form>
-    <button id='save' class='mx-2 my-3 btn btn-outine-primary'>Sauvegarder</button>
-    <button id='publish' class='mx-2 my-3 btn btn-primary'>Publier</button>
+    <button id='save' class='mx-2 my-3 btn btn-outine-primary'> <i class="fa-solid fa-floppy-disk"></i> Sauvegarder</button>
+    <button id='publish' class='mx-2 my-3 btn btn-primary'> <i class="fa-solid fa-upload"></i> Publier</button>
+    <div class="alert" >
+        <b class="alert-type"> :</b>
+        <p class="alert-message"></p>
+    </div>
     <dialog id='visualizer' style="width: 80%;">
         <div class="visualiser-header"><button class="btn btn-danger close">x</button></div>
         <div class="visualiser-conten w-80">
@@ -85,4 +90,12 @@
     <script src="{{ asset('/JS/Article/visualize.js') }}"></script>
     <script src="{{ asset('/JS/Article/save.js') }}"></script>
     <script src="{{ asset('/JS/Article/copyClipboard.js') }}"></script>
+    <script>
+        const articleSubmitMethod = 'POST';
+        const articleId = NULL;
+        const articleSubmitUrl = 'http://127.0.0.1:8000/api/articles/';
+    </script>
+    <script src="{{ asset('/JS/Article/preSubmitChecker.js') }}"></script>
+
+
 {% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}  Accueil  {% endblock %}
+
+
+{% block body %}
+    <h2 class='my-5'> {{ controller_name }} </h2>
+    <div class='row my-2'> 
+        Envie de donner vie à votre projet ? Contactez-moi grâce à ce formulaire, ou contactez-moi au mail emile00013@gmail.com
+    </div>
+
+    {{form_start(contact_form)}}
+        <h3 class="my-4"> Formulaire de contact</h3>
+        <div class="row my-2">
+            <div class="col">
+                <label for="{{field_name(contact_form.firstname)}}">Prénom</label>
+                <input type="text" value="Émile" name="{{field_name(contact_form.firstname)}}" id="{{field_name(contact_form.firstname)}}" class="form-control" required>
+            </div>
+            <div class="col">
+                <label for="{{field_name(contact_form.lastname)}}">Armenagud</label>
+                <input type="text" value="Armengaud" name="{{field_name(contact_form.lastname)}}" id="{{field_name(contact_form.lastname)}}" class="form-control" required>
+            </div>
+        </div>
+        <div class="row my-2">
+            <div class="col">
+                <label for="{{field_name(contact_form.email)}}">Email</label>
+                <input type="text" value="emile00013@gmail.com" name="{{field_name(contact_form.email)}}" id="{{field_name(contact_form.email)}}" class="form-control" required>
+            </div>
+        </div>
+        <div class="row my-2">
+            <div class="col">
+                <label for="{{field_name(contact_form.objet)}}">Objet</label>
+                <input type="text" value="Titi" name="{{field_name(contact_form.objet)}}" id="{{field_name(contact_form.objet)}}" class="form-control" required>
+            </div>
+        </div>
+        <div class="row my-2">
+            <label for="{{field_name(contact_form.message)}}">Message</label>
+            <textarea type="email" name="{{field_name(contact_form.message)}}" id="{{field_name(contact_form.message)}}" class="form-control" autocomplete="email" required>Toto</textarea>
+        </div>
+        <button class="btn btn-lg btn-primary my-2" type="submit">
+            <i class="fa-solid fa-envelope"></i> Envoyer
+        </button>
+        
+    {{form_end(contact_form)}}
+
+    
+{% endblock %}

@@ -22,6 +22,7 @@
                 <div class="col-8">
                     <p> {{article.content|slice(0, 200) }} ... </p>
                     <a class='btn btn-outline-primary' href="/articles/{{article.id}}/detail"> Continuer à lire</a> 
+                    <a class='btn btn-danger-outline border border-danger'><i class="fa-solid fa-trash-can"></i></a>
                 </div>
             </div>
 
@@ -40,6 +41,10 @@
     </style>
 
 {% endblock %}
-{% block javascript %}
-    <script src="{{ asset('/JS/Article/laodUnpublished.js') }}"></script>
+{% block javascript %}  
+    {% if app.user %}
+         {% if app.user.isAdmin %}
+            <script src="{{ asset('/JS/Article/laodUnpublished.js') }}"></script>
+        {% endif %}
+    {% endif %}
 {% endblock %}
